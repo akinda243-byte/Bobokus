@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bobokus - Cheap Data</title>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+body{font-family:Arial;background:#f2f2f2;margin:0;padding:10px;padding-bottom:80px;text-align:center}
+.header{background:#000;color:#fff;padding:20px 10px 15px;margin:-10px -10px 10px;border-radius:0 0 20px 20px}
+.header h1{margin:5px 0;font-size:36px}.header p{margin:0;line-height:1.5}.header a{color:#4da3ff}
+.tabs{display:flex;gap:8px;justify-content:center}.tabs button{padding:10px 15px;border-radius:20px;border:none;font-weight:bold;cursor:pointer;background:#ddd}.tabs button.active{background:#000;color:#FFCC00}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;text-align:left}
+.card{background:linear-gradient(105deg,#000 55%,#FFCC00 55%);border-radius:18px;padding:12px;color:#fff;min-height:120px}
+.card.telecel{background:linear-gradient(105deg,#000 55%,#E60000 55%)}.card.wide{grid-column:span 2;background:linear-gradient(105deg,#000 60%,#FFCC00 60%)}
+.price{color:#000;font-weight:bold;font-size:18px;text-align:right}.buy{background:#000;color:#fff;border:none;width:100%;padding:9px;border-radius:8px;margin-top:8px;cursor:pointer}
+.logo{font-size:11px;background:#FFCC00;color:#000;padding:3px 6px;border-radius:6px;font-weight:bold}
+.momo{background:#FFF3CD;padding:12px;border-radius:12px;margin:10px 0;font-weight:bold}
+.popup{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:99;padding:15px}
+.popup-box{background:#fff;width:100%;max-width:380px;border-radius:20px;padding:20px}
+input{width:100%;padding:12px;margin:7px 0;border-radius:10px;border:1px solid #ddd;box-sizing:border-box}
+.paidBtn{background:#00A859;color:#fff;border:none;width:100%;padding:15px;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer}
+.copyBtn{background:#000;color:#FFCC00;border:none;padding:10px 18px;border-radius:10px;font-weight:bold}
+</style></head><body>
+<div class="header"><h1>BOBOKUS</h1><p>Adams Ismail<br>Cheap Data - Fast Delivery<br><a href="tel:0544144774">0544144774</a></p></div>
+<div class="momo">Pay Securely With Paystack<br>MoMo • Card • Bank • 0544144774 - Adams Ismail</div>
+<div class="tabs"><button class="active" onclick="show('MTN',this)">MTN</button><button onclick="show('Telecel',this)">Telecel</button><button onclick="show('MashUp',this)">MashUp</button></div>
+<div class="grid" id="grid"></div>
+<div class="popup" id="popup"><div class="popup-box"><h2>💳 Pay With Paystack</h2><p id="payTitle"></p><div style="background:#FFF3CD;padding:15px;border-radius:15px"><div style="font-size:28px;font-weight:bold" id="payAmount"></div><div>Secure Payment via Paystack</div><br><button class="copyBtn" onclick="copyNum()">📋 Copy Number</button></div><input id="pName" placeholder="Your Name"><input id="pEmail" placeholder="Your Email (for receipt)" type="email"><input id="pRec" placeholder="Number to send data to"><button class="paidBtn" onclick="payWithPaystack()">🔒 Pay Now With Paystack</button><p onclick="closePopup()" style="color:#999;cursor:pointer">Cancel</p></div></div>
+<script>
+const bundles=[
+{n:'MTN',s:'1GB',p:7},{n:'MTN',s:'2GB',p:13},{n:'MTN',s:'3GB',p:20},{n:'MTN',s:'4GB',p:27},{n:'MTN',s:'5GB',p:33},{n:'MTN',s:'6GB',p:40},{n:'MTN',s:'7GB',p:47},{n:'MTN',s:'8GB',p:55},{n:'MTN',s:'9GB',p:62},{n:'MTN',s:'10GB',p:68},{n:'MTN',s:'15GB',p:101},{n:'MTN',s:'20GB',p:138},{n:'MTN',s:'25GB',p:173},{n:'MTN',s:'30GB',p:208},{n:'MTN',s:'35GB',p:243},{n:'MTN',s:'40GB',p:278},{n:'MTN',s:'45GB',p:313},{n:'MTN',s:'50GB',p:348},{n:'MTN',s:'60GB',p:417},{n:'MTN',s:'70GB',p:486},{n:'MTN',s:'80GB',p:557},{n:'MTN',s:'90GB',p:626},{n:'MTN',s:'100GB',p:677},
+{n:'Telecel',s:'1GB',p:6},{n:'Telecel',s:'2GB',p:11},{n:'Telecel',s:'3GB',p:16},{n:'Telecel',s:'4GB',p:21},{n:'Telecel',s:'5GB',p:26},{n:'Telecel',s:'6GB',p:32},{n:'Telecel',s:'7GB',p:36},{n:'Telecel',s:'8GB',p:42},{n:'Telecel',s:'9GB',p:48},{n:'Telecel',s:'10GB',p:52},{n:'Telecel',s:'15GB',p:80},{n:'Telecel',s:'20GB',p:107},{n:'Telecel',s:'25GB',p:134},{n:'Telecel',s:'30GB',p:162},{n:'Telecel',s:'35GB',p:189},{n:'Telecel',s:'40GB',p:218},{n:'Telecel',s:'45GB',p:243},{n:'Telecel',s:'50GB',p:270},{n:'Telecel',s:'60GB',p:328},{n:'Telecel',s:'70GB',p:380},{n:'Telecel',s:'80GB',p:436},{n:'Telecel',s:'90GB',p:489},{n:'Telecel',s:'100GB',p:545},
+{n:'MashUp',s:'511 MB',p:16,desc:'176 MTN mins · 22 other mins · 45 SMS · 30 days'},{n:'MashUp',s:'1.02 GB',p:30,desc:'353 MTN mins · 88 other mins · 88 SMS · 30 days'},{n:'MashUp',s:'2.01 GB',p:40,desc:'397 MTN mins · 114 other mins · 88 SMS · 30 days'}
+];
+let cur='MTN',sel=null;
+function show(n,btn){cur=n;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+function render(){document.getElementById('grid').innerHTML=bundles.filter(b=>b.n===cur).map(b=>{let cls=b.n==='Telecel'?'card telecel':'card'; if(b.n==='MashUp')cls='card wide'; return `<div class="${cls}"><span class="logo">${b.n==='MashUp'?'MTN MASH UP':b.n}</span><div style="font-size:26px;font-weight:bold;margin-top:8px">${b.s}</div><div style="font-size:12px">${b.desc||'Non Expire'}</div><div class="price">GHC ${b.p}</div><button class="buy" onclick="selectB('${b.n}','${b.s}',${b.p})">Buy Now</button></div>`}).join('');}
+function selectB(n,s,p){sel={n,s,p};document.getElementById('payTitle').innerText=n+' '+s;document.getElementById('payAmount').innerText='GHC '+p;document.getElementById('popup').style.display='flex';}
+function closePopup(){document.getElementById('popup').style.display='none';}
+function copyNum(){navigator.clipboard.writeText('0544144774');alert('Copied: 0544144774');}
+function payWithPaystack(){
+let name=document.getElementById('pName').value.trim();
+let email=document.getElementById('pEmail').value.trim();
+let rec=document.getElementById('pRec').value.trim();
+if(!name||!rec) return alert('Enter your name + number to send data to');
+if(!email) email='customer@bobokus.com';
+let handler=PaystackPop.setup({
+key:'pk_live_a4ea8eecf44930475be10c6c05501d8b99da1a5a',
+email:email,
+amount: sel.p * 100,
+currency:'GHS',
+ref: 'BOBOKUS-'+Date.now(),
+metadata:{custom_fields:[{display_name:'Buyer Name',variable_name:'buyer_name',value:name},{display_name:'Send Data To',variable_name:'recipient',value:rec},{display_name:'Bundle',variable_name:'bundle',value:sel.n+' '+sel.s}]},
+callback:function(response){
+let msg=`Hello Bobokus, I PAID with Paystack ✅ Ref: ${response.reference}. Bundle: ${sel.s} ${sel.n} - GHC ${sel.p}. Name: ${name}. Send data to: ${rec}.`;
+window.open('https://wa.me/233544144774?text='+encodeURIComponent(msg),'_blank');
+alert('Payment Successful! Ref: '+response.reference+' - We will send your data now.');
+closePopup();
+},
+onClose:function(){alert('Payment window closed.');}
+});
+handler.openIframe();
+}
+render();
+</script></body></html>
